@@ -53,7 +53,9 @@ async function handleSubmit(e) {
         Notify.success(`Hooray! We found ${data.totalHits} images.`);
         render(data.hits);
         smoothScroll();
-        observer.observe(refs.sentinel);
+        if (_page < Math.ceil(data.totalHits / 40)) {
+          observer.observe(refs.sentinel);
+        }      
       }
       return data;
     })
@@ -75,7 +77,9 @@ function onEntry(entries) {
   entries.forEach(async entry => {
     if (entry.isIntersecting && query !== '')  {
       _page += 1; 
-      observer.observe(refs.sentinel)
+      if (_page < Math.ceil(data.totalHits / 40)) {
+        observer.observe(refs.sentinel)
+      }
       refs.spinner.classList.remove('js-hidden');
       await fetchImage(query, _page, _per_page)
         .then(data => {
