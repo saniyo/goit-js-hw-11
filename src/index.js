@@ -77,24 +77,21 @@ function onEntry(entries) {
   entries.forEach(async entry => {
     if (entry.isIntersecting && query !== '')  {
       _page += 1; 
-      if (_page < Math.ceil(data.totalHits / 40)) {
-        observer.observe(refs.sentinel)
-      }
       refs.spinner.classList.remove('js-hidden');
       await fetchImage(query, _page, _per_page)
-        .then(data => {
-          render(data.hits);
-          smoothScroll();
-          return data;
-        })
-        .then(data => {
-          const totalPage = data.totalHits / _per_page;
-          if (_page >= totalPage) {
-            Notify.info(
-              "We're sorry, but you've reached the end of search results."
+      .then(data => {
+        render(data.hits);
+        smoothScroll();
+        if (_page < Math.ceil(data.totalHits / 40)) {
+          observer.observe(refs.sentinel)
+        }
+        const totalPage = data.totalHits / _per_page;
+        if (_page >= totalPage) {
+          Notify.info(
+            "We're sorry, but you've reached the end of search results."
             );
             observer.unobserve(refs.sentinel);
-            return;
+            return data;
           }
         })
         .catch(err => err.message)
